@@ -3,7 +3,7 @@ import { getSupabaseAdmin } from '@/lib/supabase'
 
 export async function POST(request: NextRequest) {
   // Cek env vars tersedia
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
     console.error('[check] ERROR: Missing Supabase environment variables')
     return NextResponse.json(
       { error: 'Konfigurasi server belum lengkap. Hubungi administrator.' },
