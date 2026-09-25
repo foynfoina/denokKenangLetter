@@ -1,36 +1,83 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 👑 Denok Kenang Letter – SMKN 9 Semarang
 
-## Getting Started
+Website pengumuman resmi penerimaan anggota organisasi **Denok Kenang** SMK Negeri 9 Semarang.
 
-First, run the development server:
+## 🚀 Tech Stack
+
+- **Framework**: Next.js 15 (App Router)
+- **Styling**: Tailwind CSS
+- **Database**: Supabase (PostgreSQL)
+- **Deploy**: Vercel
+
+---
+
+## ⚙️ Setup Lokal
+
+### 1. Clone & Install
+
+```bash
+git clone <your-repo-url>
+cd denok-kenang-letter
+npm install
+```
+
+### 2. Setup Supabase
+
+1. Buat akun di [supabase.com](https://supabase.com) → **New Project**
+2. Buka **SQL Editor** → paste isi file `supabase/schema.sql` → **Run**
+3. Edit data peserta di tabel `peserta` (via Dashboard > Table Editor)
+4. Ambil API keys di **Project Settings → API**
+
+### 3. Isi Environment Variables
+
+Salin `.env.example` → `.env.local`, lalu isi dengan credentials Supabase:
+
+```bash
+cp .env.example .env.local
+```
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGci...
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGci...
+```
+
+> ⚠️ **PENTING**: `SUPABASE_SERVICE_ROLE_KEY` adalah secret key. Jangan pernah di-commit ke GitHub!
+
+### 4. Jalankan Dev Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Buka [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🗄️ Mengelola Data Peserta
 
-## Learn More
+Buka **Supabase Dashboard → Table Editor → tabel `peserta`**:
 
-To learn more about Next.js, take a look at the following resources:
+| Kolom      | Keterangan                                      |
+|------------|-------------------------------------------------|
+| `nama`     | Nama lengkap peserta (**huruf kecil semua**)    |
+| `nis`      | Nomor Induk Siswa                               |
+| `posisi`   | Misal: `Denok SMKN 9 Semarang 2024`            |
+| `diterima` | `true` = diterima, `false` = tidak diterima     |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🌐 Deploy ke Vercel
 
-## Deploy on Vercel
+1. Push ke GitHub
+2. Buka [vercel.com](https://vercel.com) → **New Project** → import repo
+3. Tambahkan **Environment Variables** (sama seperti `.env.local`) di Vercel dashboard
+4. Deploy!
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🔒 Keamanan
+
+- Pengecekan nama/NIS dilakukan **server-side** via API route, bukan di browser
+- Row Level Security (RLS) aktif → data tidak bisa diakses langsung via Supabase public key
+- `.env.local` tidak pernah masuk ke Git (sudah di-exclude di `.gitignore`)
