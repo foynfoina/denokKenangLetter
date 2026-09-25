@@ -6,13 +6,16 @@ let _supabaseAdmin: SupabaseClient | null = null
 export function getSupabaseAdmin(): SupabaseClient {
   if (_supabaseAdmin) return _supabaseAdmin
 
-  // Tidak pakai NEXT_PUBLIC_ — semua akses hanya dari server
-  const url = process.env.SUPABASE_URL
+  // Support kedua format nama env var (NEXT_PUBLIC_ dan tanpa prefix)
+  const url =
+    process.env.NEXT_PUBLIC_SUPABASE_URL ||
+    process.env.SUPABASE_URL
+
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY
 
   if (!url || !key) {
     throw new Error(
-      'Missing Supabase env vars: SUPABASE_URL atau SUPABASE_SERVICE_ROLE_KEY'
+      'Missing Supabase env vars: NEXT_PUBLIC_SUPABASE_URL dan SUPABASE_SERVICE_ROLE_KEY harus diset'
     )
   }
 

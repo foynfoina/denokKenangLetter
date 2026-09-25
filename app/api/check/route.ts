@@ -2,9 +2,15 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
 
 export async function POST(request: NextRequest) {
-  // Cek env vars tersedia
-  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    console.error('[check] ERROR: Missing Supabase environment variables')
+  // Cek env vars tersedia (support NEXT_PUBLIC_ prefix)
+  const supabaseUrl =
+    process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL
+
+  if (!supabaseUrl || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    console.error('[check] ERROR: Missing Supabase environment variables', {
+      hasUrl: !!supabaseUrl,
+      hasServiceKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+    })
     return NextResponse.json(
       { error: 'Konfigurasi server belum lengkap. Hubungi administrator.' },
       { status: 500 }
@@ -15,7 +21,6 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { nama, nis } = body
 
-    // Validasi input
     if (!nama || !nis) {
       return NextResponse.json(
         { error: 'Nama dan NIS wajib diisi' },
