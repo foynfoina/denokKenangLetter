@@ -2,6 +2,15 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
 
 export async function POST(request: NextRequest) {
+  // Cek env vars tersedia
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    console.error('[check] ERROR: Missing Supabase environment variables')
+    return NextResponse.json(
+      { error: 'Konfigurasi server belum lengkap. Hubungi administrator.' },
+      { status: 500 }
+    )
+  }
+
   try {
     const body = await request.json()
     const { nama, nis } = body
@@ -17,36 +26,39 @@ export async function POST(request: NextRequest) {
     const namaTrimmed = nama.trim().toLowerCase()
     const nisTrimmed = nis.trim()
 
-    // Cek ke database Supabase (hanya dijalankan saat runtime)
+    console.log(`[check] Mencari: nama="${namaTrimmed}", nis="${nisTrimmed}"`)
+
     const supabaseAdmin = getSupabaseAdmin()
 
     const { data, error } = await supabaseAdmin
       .from('peserta')
       .select('nama, nis, posisi, diterima')
-      .ilike('nama', namaTrimmed) // case-insensitive match
+      .ilike('nama', namaTrimmed)
       .eq('nis', nisTrimmed)
       .single()
 
     if (error && error.code !== 'PGRST116') {
-      // PGRST116 = row not found, bukan error sebenarnya
-      console.error('Supabase error:', error)
+      console.error('[check] Supabase error:', JSON.stringify(error))
       return NextResponse.json(
-        { error: 'Terjadi kesalahan server' },
+        { error: `Terjadi kesalahan server: ${error.message}` },
         { status: 500 }
       )
     }
 
     if (!data) {
+      console.log('[check] Data tidak ditemukan')
       return NextResponse.json({ found: false, diterima: false })
     }
 
+    console.log(`[check] Ditemukan: ${data.nama}, diterima=${data.diterima}`)
     return NextResponse.json({
       found: true,
       diterima: data.diterima,
       nama: data.nama,
       posisi: data.posisi ?? null,
     })
-  } catch {
+  } catch (err) {
+    console.error('[check] Unexpected error:', err)
     return NextResponse.json({ error: 'Request tidak valid' }, { status: 400 })
   }
 }
